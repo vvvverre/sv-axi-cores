@@ -117,7 +117,7 @@ module axis_multichannel_accumulator #
     always @(posedge aclk) begin
         if (!aresetn) begin
             counter <= 0;
-        end else if (buf_last) begin
+        end else if (buf_last && nstall) begin
             if (last)
                 counter <= 0;
             else
@@ -126,8 +126,10 @@ module axis_multichannel_accumulator #
     end
     
     always @(posedge aclk) begin
-        input_data <= buf_data;
-        reg_tlast <= buf_last;
+        if (nstall) begin
+            input_data <= buf_data;
+            reg_tlast <= buf_last;
+        end
 
         mem_wraddr <= mem_rdaddr;
         mem_write <= buf_valid && nstall;
@@ -143,7 +145,8 @@ module axis_multichannel_accumulator #
         m_axis_tdata_int <= sum_wire;
 
     always @(posedge aclk)
-        mem_rddata <= memory[mem_rdaddr];    
+        if (nstall)
+            mem_rddata <= memory[mem_rdaddr];    
     
     always @(posedge aclk)
         if (mem_write)
