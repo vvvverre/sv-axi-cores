@@ -82,6 +82,11 @@ def block_data_random(block_size, rate, nbits=16):
 def cycle_pause():
     return itertools.cycle([1, 1, 1, 0])
 
+def random_pause(f = 0.5):
+    global rng
+    while True:
+        yield int(rng.uniform() >= f)
+
 rng = np.random.default_rng(12345)
 
 factory = TestFactory(run_test)
@@ -89,8 +94,8 @@ factory.add_option("rate", [16, 32])
 factory.add_option("block_size", [64, 128])
 factory.add_option("block_data_gen", [block_data_linear, block_data_random])
 # factory.add_option("nblocks", [1, 2, 5])
-factory.add_option("idle_generator", [None, cycle_pause])
-factory.add_option("backpressure_generator", [None, cycle_pause])
+factory.add_option("idle_generator", [None, cycle_pause, random_pause])
+factory.add_option("backpressure_generator", [None, cycle_pause, random_pause])
 # factory.add_option("block_data_gen", [block_data_linear])
 # factory.add_option("backpressure_generator", [cycle_pause])
 factory.generate_tests()
