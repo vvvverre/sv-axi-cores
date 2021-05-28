@@ -3,6 +3,8 @@ sim_build/
 .pytest_cache/
 
 *.vcd
+*.fst
+
 results.xml
 cocotb.log
 iverilog_dump.v
