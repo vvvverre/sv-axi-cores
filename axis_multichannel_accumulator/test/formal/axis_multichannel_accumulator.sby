@@ -1,0 +1,20 @@
+[tasks]
+bmc
+
+
+[options]
+bmc: mode bmc
+bmc: depth 20
+
+[engines]
+smtbmc
+
+[script]
+read -formal axis_skid_buffer.sv
+read -formal axis_multichannel_accumulator.sv
+prep -top axis_multichannel_accumulator
+
+[files]
+../../rtl/axis_multichannel_accumulator.sv
+../../../axis_skid_buffer/rtl/axis_skid_buffer.sv
+

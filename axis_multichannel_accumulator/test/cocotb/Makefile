@@ -4,7 +4,8 @@
 SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
 
-VERILOG_SOURCES += $(PWD)/../../axis_skid_buffer/rtl/axis_skid_buffer.sv $(PWD)/../rtl/axis_multichannel_accumulator.sv 
+VERILOG_SOURCES += $(PWD)/../../../axis_skid_buffer/rtl/axis_skid_buffer.sv
+VERILOG_SOURCES += $(PWD)/../../rtl/axis_multichannel_accumulator.sv 
 # use VHDL_SOURCES for VHDL files
 
 # TOPLEVEL is the name of the toplevel module in your Verilog or VHDL file

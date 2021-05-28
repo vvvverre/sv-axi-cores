@@ -74,14 +74,6 @@ module axis_skid_buffer #
 
     assign s_axis_tready = !r_valid;
 
-`ifdef COCOTB_SIM
-initial begin
-  $dumpfile ("axis_skid_buffer.vcd");
-  $dumpvars (0, axis_skid_buffer);
-  #1;
-end
-`endif
-
 endmodule
 
 `default_nettype wire

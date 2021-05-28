@@ -66,7 +66,7 @@ module axis_multichannel_accumulator #
     end
 
     assign s_axis_valid = buf_valid && !stall && aresetn;
-    assign sum_wire = $signed(mem_rddata) + $signed(input_data);
+    assign sum_wire = $signed(mem_rddata) + ACC_WIDTH'($signed(input_data));
     assign last = (counter == (rate - 1));
     assign stall = m_axis_tvalid && !m_axis_tready;
 
@@ -93,9 +93,9 @@ module axis_multichannel_accumulator #
 
     always @(*)
         if (counter_zero_dly) 
-            mem_wrdata <= $signed(input_data);
+            mem_wrdata = ACC_WIDTH'($signed(input_data));
         else
-            mem_wrdata <= sum_wire;
+            mem_wrdata = sum_wire;
 
     always @(posedge aclk) begin
         if (!aresetn) begin
@@ -129,7 +129,7 @@ module axis_multichannel_accumulator #
             m_axis_tlast <= buf_last;
 
     always @(*)
-        m_axis_tdata <= sum_wire;
+        m_axis_tdata = sum_wire;
 
     always @(posedge aclk)
         if (stall || (last && buf_valid))
@@ -159,8 +159,35 @@ module axis_multichannel_accumulator #
 initial begin
   $dumpfile ("axis_multichannel_accumulator.vcd");
   $dumpvars (0, axis_multichannel_accumulator);
-  #1;
+  //#1;
 end
+`endif
+
+`ifdef FORMAL
+
+    reg	f_past_valid = 1'b0;
+    always @(posedge aclk)
+        f_past_valid <= 1'b1;
+
+    always @(*)
+        if (!f_past_valid)
+            assume(!aresetn);
+    
+    always @(posedge aclk) begin
+        if (f_past_valid && $past(aresetn)) begin
+            if ($past(s_axis_tvalid && !s_axis_tready)) begin
+                assume(s_axis_tvalid);
+                assume($stable(s_axis_tdata));
+                assume($stable(s_axis_tlast));
+            end
+
+            if ($past(m_axis_tvalid && !m_axis_tready)) begin
+                assert(m_axis_tvalid);
+                assert($stable(m_axis_tdata));
+                assert($stable(m_axis_tlast));
+            end
+        end
+    end
 `endif
 
 endmodule

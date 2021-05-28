@@ -1,6 +1,6 @@
 import cocotb
 from cocotb.clock import Clock
-from cocotb.triggers import RisingEdge
+from cocotb.triggers import RisingEdge, with_timeout
 from cocotb.regression import TestFactory
 from cocotb.generators.bit import wave, intermittent_single_cycles, random_50_percent
 
@@ -46,7 +46,7 @@ async def run_test(dut, nblocks=1, rate=4, block_size=8, block_data_gen=None, id
     tb.set_backpressure_generator(backpressure_generator)
     dut.rate <= rate
 
-    block_data_gen = block_data_gen or (lambda x, y: np.full((rate, block_size), 10))
+    block_data_gen = block_data_gen or (lambda x, y: np.full((y, x), 10))
     
     await tb.reset()
 
@@ -58,7 +58,7 @@ async def run_test(dut, nblocks=1, rate=4, block_size=8, block_data_gen=None, id
             test_frame = AxiStreamFrame(list(map(int, block_data[ii])))
             await tb.source.send(test_frame)
 
-        recv_frame = await tb.sink.recv()
+        recv_frame = await with_timeout(cocotb.fork(tb.sink.recv()), 250, 'us')
 
         for _ in range(100):
             await RisingEdge(dut.aclk)

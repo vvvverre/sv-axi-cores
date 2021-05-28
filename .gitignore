@@ -1,6 +1,12 @@
 __pycache__/
 sim_build/
+.pytest_cache/
 
 *.vcd
 results.xml
+cocotb.log
+iverilog_dump.v
+
+**/*_bmc/
+**/*_cvr/
 
