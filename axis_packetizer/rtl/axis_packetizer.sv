@@ -13,7 +13,7 @@ module axis_packetizer #
     input  wire                             aclk,
     input  wire                             aresetn,
 
-    input  wire [COUNTER_WIDTH-1:0]         limit,
+    input  wire [COUNTER_WIDTH-1:0]         frame_length,
 
     /*
      * AXI-Stream slave interface
@@ -31,12 +31,12 @@ module axis_packetizer #
     input  wire                             m_axis_tready
 );
 
-reg  [COUNTER_WIDTH-1:0]    int_limit = 0;
+reg  [COUNTER_WIDTH-1:0]    int_frame_length = 0;
 reg  [COUNTER_WIDTH-1:0]    counter = 0;
 
 always_ff @(posedge aclk)
     if (counter == 0)
-        int_limit <= limit - 1;
+        int_frame_length <= frame_length - 1;
 
 always_ff @(posedge aclk)
     if (!aresetn)
@@ -50,7 +50,7 @@ generate if (OPT_REGISTER == 0) begin : COMBINATORIAL
 
     assign m_axis_tdata = s_axis_tdata;
     assign m_axis_tvalid = s_axis_tvalid;
-    assign m_axis_tlast = (counter == int_limit);
+    assign m_axis_tlast = (counter == int_frame_length);
 
     assign s_axis_tready = m_axis_tready;
 

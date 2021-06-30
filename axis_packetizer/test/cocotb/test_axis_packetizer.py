@@ -77,7 +77,7 @@ async def run_test(dut, nblocks=1, frame_length=128, data_generator=None, pause_
 
     frame_length = frame_length or 2**(dut.COUNTER_WIDTH.value)
 
-    dut.limit <= frame_length
+    dut.frame_length <= frame_length
     await tb.reset()
 
     for nn in range(nblocks):

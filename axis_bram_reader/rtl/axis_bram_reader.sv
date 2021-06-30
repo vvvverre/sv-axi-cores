@@ -15,7 +15,7 @@ module axis_bram_reader #
     input  wire [ADDR_WIDTH-1:0]        limit,
 
     /*
-     * AXI-Stream slave interface
+     * AXI-Stream master interface
      */
     output reg  [DATA_WIDTH-1:0]  		m_axis_tdata,
     output reg                          m_axis_tvalid,
@@ -68,11 +68,11 @@ module axis_bram_reader #
 
 	always_comb
 		if (!aresetn)
-			bram_addr_next <= {ADDR_WIDTH{1'b0}};
+			bram_addr_next = {ADDR_WIDTH{1'b0}};
 		else if (last)
-			bram_addr_next <= {ADDR_WIDTH{1'b0}};
+			bram_addr_next = {ADDR_WIDTH{1'b0}};
 		else
-			bram_addr_next <= bram_addr + 1;
+			bram_addr_next = bram_addr + 1;
 
 	always_ff @(posedge aclk)
 		if (!aresetn)
@@ -88,11 +88,11 @@ module axis_bram_reader #
 
 	always_comb
 		if (!aresetn)
-			m_axis_tdata <= {DATA_WIDTH{1'b0}};
+			m_axis_tdata = {DATA_WIDTH{1'b0}};
 		else if (stall_prev)
-			m_axis_tdata <= rddata_buf;
+			m_axis_tdata = rddata_buf;
         else
-            m_axis_tdata <= bram_rddata;
+            m_axis_tdata = bram_rddata;
 
 	always_ff @(posedge aclk)
         m_axis_tvalid <= aresetn;
@@ -107,7 +107,7 @@ module axis_bram_reader #
             m_axis_tlast <= last;
 
 	always_comb
-        bram_we <= 0;
+        bram_we = 0;
 	
 	always_comb
 		bram_clk = aclk;
